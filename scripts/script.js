@@ -305,8 +305,17 @@ function showMoreCards({
     // по клику запросим данные для следующей страницы
     let currentPage = dataArray.pagination.page;
     let urlToFetch = `${initialEndpoint}pagination[page]=${(currentPage += 1)}&`;
+    buttonInDOM.disabled = true;
+    buttonInDOM.textContent = 'Загрузка…';
+    showPreloader(preloaderTmp, cardsContainer);
+
     try {
-      let data = await (await fetch(urlToFetch)).json();
+      const response = await fetch(urlToFetch);
+      if (!response.ok) {
+        throw new Error('request-failed');
+      }
+      const data = await response.json();
+      removePreloader(cardsContainer, '.preloader');
       buttonInDOM.remove();
       cardsOnPageState = cardsOnPageState.concat(data.results);
       appendCards({
@@ -332,7 +341,10 @@ function showMoreCards({
         cardTmp,
       });
     } catch (err) {
-      return err;
+      removePreloader(cardsContainer, '.preloader');
+      buttonInDOM.disabled = false;
+      buttonInDOM.textContent = 'Не удалось загрузить. Повторить';
+      console.log(err);
     }
   });
 }
