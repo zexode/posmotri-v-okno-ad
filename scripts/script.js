@@ -150,12 +150,15 @@ async function waitForReadyVideo(video) {
       return;
     }
 
+    let timeoutId;
     const finish = () => {
+      clearTimeout(timeoutId);
       video.removeEventListener('canplaythrough', finish);
       video.removeEventListener('error', finish);
       resolve();
     };
 
+    timeoutId = setTimeout(finish, 10000);
     video.addEventListener('canplaythrough', finish, { once: true });
     video.addEventListener('error', finish, { once: true });
   });
