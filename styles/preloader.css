@@ -1,7 +1,9 @@
 .preloader {
-  position: absolute;
-  inset: 0;
+  grid-area: 1 / 1;
+  z-index: 2;
   display: flex;
+  width: 100%;
+  height: 100%;
   justify-content: center;
   align-items: center;
   background: #545050;
