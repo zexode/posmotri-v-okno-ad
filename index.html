@@ -14,9 +14,18 @@
     <main class="content">
       <section class="result">
         <div class="result__video-container">
-          <video src="" controls class="result__video" poster=""></video>
+          <video
+            src=""
+            controls
+            class="result__video"
+            poster=""
+            aria-label="Видео из выбранного города"
+          ></video>
         </div>
-        <form class="search-form">
+        <form
+          class="search-form"
+          aria-label="Поиск видео по городу и времени суток"
+        >
           <fieldset class="search-form__fieldset">
             <h2 class="search-form__fieldset-title">Город</h2>
             <label class="search-form__label">
@@ -84,13 +93,14 @@
     <!-- ТЕМПЛЕЙТЫ -->
 
     <template class="preloader-template">
-      <div class="preloader">
+      <div class="preloader" role="status" aria-live="polite">
         <div class="preloader-chasing-squares">
           <div class="square"></div>
           <div class="square"></div>
           <div class="square"></div>
           <div class="square"></div>
         </div>
+        <span class="visually-hidden">Загрузка видео и карточек</span>
       </div>
     </template>
 
@@ -112,7 +122,7 @@
     </template>
 
     <template class="error-template">
-      <div class="error">
+      <div class="error" role="alert" aria-live="assertive">
         <h2 class="error__title">Из этого города нет видео :(</h2>
       </div>
     </template>
