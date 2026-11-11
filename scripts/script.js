@@ -22,6 +22,7 @@ const moreButtonTmp = document.querySelector('.more-button-template');
 // Нужен для работы с переключателями
 let cardsOnPageState = [];
 let latestSearchId = 0;
+let latestVideoChangeId = 0;
 
 // Первая загрузка ✅
 
@@ -253,6 +254,8 @@ function chooseCurrentVideo({
     cardsList.forEach((item) => {
       item.onclick = async (e) => {
         e.preventDefault();
+        const videoChangeId = ++latestVideoChangeId;
+
         cardsList.forEach((item) => {
           item.classList.remove(currentLinkClassName);
         });
@@ -268,7 +271,11 @@ function chooseCurrentVideo({
           posterUrl: vidoObj.poster.url,
         });
         await waitForReadyVideo(mainVideo);
+        if (videoChangeId !== latestVideoChangeId) return;
+
         await delay(preloaderWaitindTime);
+        if (videoChangeId !== latestVideoChangeId) return;
+
         removePreloader(videoContainer, '.preloader');
         console.log('Переключил видео');
       };
