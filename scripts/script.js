@@ -217,15 +217,16 @@ function serializeFormData(form) {
   }, []);
   console.log('Собрал данные формы в объект');
   return {
-    city: city.value,
+    city: city.value.trim(),
     timeArray: checkedValuesArray,
   };
 }
 
 // Генерирует строку с фильтрами запросов в API в зависимости от данных из формы ✅
 function generateFilterRequest(endpoint, city, timeArray) {
-  if (city) {
-    endpoint += `filters[city][$containsi]=${city}&`;
+  const normalizedCity = city.trim();
+  if (normalizedCity) {
+    endpoint += `filters[city][$containsi]=${encodeURIComponent(normalizedCity)}&`;
   }
   if (timeArray) {
     timeArray.forEach((timeslot) => {
