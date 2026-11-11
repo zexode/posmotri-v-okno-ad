@@ -21,6 +21,7 @@ const moreButtonTmp = document.querySelector('.more-button-template');
 
 // Нужен для работы с переключателями
 let cardsOnPageState = [];
+let latestSearchId = 0;
 
 // Первая загрузка ✅
 
@@ -58,8 +59,16 @@ form.onsubmit = (e) => {
 /* ФУНКЦИЯ, КОТОРАЯ ВСЕ ГЕНЕРИТ */
 
 async function mainMechanics(endpoint) {
+  const searchId = ++latestSearchId;
+
   try {
-    const data = await (await fetch(endpoint)).json();
+    const response = await fetch(endpoint);
+    if (!response.ok) {
+      throw new Error('request-failed');
+    }
+
+    const data = await response.json();
+    if (searchId !== latestSearchId) return;
     cardsOnPageState = data.results;
 
     if (!data?.results?.[0]) {
@@ -83,6 +92,7 @@ async function mainMechanics(endpoint) {
       .querySelectorAll('.content__card-link')[0]
       .classList.add('content__card-link_current');
     await waitForReadyVideo(videoElement);
+    if (searchId !== latestSearchId) return;
     await delay(preloaderWaitindTime);
     removePreloader(videoContainer, '.preloader');
     removePreloader(cardsContainer, '.preloader');
@@ -108,6 +118,8 @@ async function mainMechanics(endpoint) {
       cardTmp: cardTmp,
     });
   } catch (err) {
+    if (searchId !== latestSearchId) return;
+
     if (err.message === 'not-found') {
       showError(videoContainer, videoNotFoundTmp, 'Нет подходящих видео =(');
     } else {
@@ -133,12 +145,26 @@ async function delay(ms) {
 
 async function waitForReadyVideo(video) {
   return await new Promise((resolve) => {
-    video.oncanplaythrough = resolve;
+    if (video.readyState >= 3) {
+      resolve();
+      return;
+    }
+
+    const finish = () => {
+      video.removeEventListener('canplaythrough', finish);
+      video.removeEventListener('error', finish);
+      resolve();
+    };
+
+    video.addEventListener('canplaythrough', finish, { once: true });
+    video.addEventListener('error', finish, { once: true });
   });
 }
 
 // Устанавливает прелоадер на время загрузки данных ✅
 function showPreloader(tmp, parent) {
+  if (parent.querySelector('.preloader')) return;
+
   const node = tmp.content.cloneNode(true);
   parent.append(node);
   console.log('показал прелоадер');
